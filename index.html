@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo App</title>
+</head>
+<body>
+    <h1>Todo App</h1>
+    <input type="text" id="todoInput" placeholder="Enter a todo">
+    <button onclick="addTodo()">Add Todo</button>
+    <ul id="todoList"></ul>
+
+    <script>
+        const backendUrl = 'http://localhost:3000'; // Change this to your server's IP or domain when deployed
+
+        // Fetch all todos from the backend
+        async function fetchTodos() {
+            const response = await fetch(`${backendUrl}/todos`);
+            const todos = await response.json();
+
+            const todoList = document.getElementById('todoList');
+            todoList.innerHTML = '';
+
+            todos.forEach(todo => {
+                const li = document.createElement('li');
+                li.textContent = todo.text;
+                li.id = todo._id;
+
+                const deleteButton = document.createElement('button');
+/*************  ✨ Codeium Command ⭐  *************/
+                /**
+                 * Delete the todo by making a DELETE request to the server.
+                 * The id is obtained from the todo object.
+                 * After deletion, fetch the updated list of todos.
+                 */
+/******  1154f634-7fa1-43a8-b02f-46bc5ef515c6  *******/                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteTodo(todo._id);
+
+                li.appendChild(deleteButton);
+                todoList.appendChild(li);
+            });
+        }
+
+        // Add a new todo
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+
+            if (text === '') return;
+
+            await fetch(`${backendUrl}/todos`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text }),
+            });
+
+            input.value = '';
+            fetchTodos();
+        }
+
+        // Delete a todo
+        async function deleteTodo(id) {
+            await fetch(`${backendUrl}/todos/${id}`, {
+                method: 'DELETE',
+            });
+
+            fetchTodos();
+        }
+
+        fetchTodos();
+    </script>
+</body>
+</html>
