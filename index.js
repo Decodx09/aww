@@ -8,10 +8,16 @@ const app = express();
 const port = 3000;
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(morgan('dev')); // Logs requests to the console
 app.use(helmet()); // Adds various HTTP headers to secure the app
+
+app.use(cors({
+    origin: '*', // For testing purposes. Replace with your actual S3 URL in production.
+    methods: ['GET', 'POST', 'DELETE'],
+    allowedHeaders: ['Content-Type']
+}));
+
 
 // MongoDB Connection String
 const mongoURI = "mongodb+srv://shivanshsukhijaengineer:1qQ2pX26pTqhJvZo@cluster0.ejlncka.mongodb.net/todoApp?retryWrites=true&w=majority";
