@@ -10,34 +10,42 @@
     <ul id="todoList"></ul>
 
     <script>
-    const backendUrl = 'http://default-1290201068.us-east-1.elb.amazonaws.com'; 
+        // Use HTTPS if your Load Balancer supports it
+        const backendUrl = 'http://default-1290201068.us-east-1.elb.amazonaws.com'; 
 
         // Fetch all todos from the backend
         async function fetchTodos() {
-            const response = await fetch(`${backendUrl}/todos`);
-            const todos = await response.json();
+            try {
+                const response = await fetch(`${backendUrl}/todos`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
 
-            const todoList = document.getElementById('todoList');
-            todoList.innerHTML = '';
+                if (!response.ok) {
+                    console.error('Error fetching todos:', response.statusText);
+                    return;
+                }
 
-            todos.forEach(todo => {
-                const li = document.createElement('li');
-                li.textContent = todo.text;
-                li.id = todo._id;
+                const todos = await response.json();
 
-                const deleteButton = document.createElement('button');
-/*************  ✨ Codeium Command ⭐  *************/
-                /**
-                 * Delete the todo by making a DELETE request to the server.
-                 * The id is obtained from the todo object.
-                 * After deletion, fetch the updated list of todos.
-                 */
-/******  1154f634-7fa1-43a8-b02f-46bc5ef515c6  *******/                deleteButton.textContent = 'Delete';
-                deleteButton.onclick = () => deleteTodo(todo._id);
+                const todoList = document.getElementById('todoList');
+                todoList.innerHTML = '';
 
-                li.appendChild(deleteButton);
-                todoList.appendChild(li);
-            });
+                todos.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.textContent = todo.text;
+                    li.id = todo._id;
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = () => deleteTodo(todo._id);
+
+                    li.appendChild(deleteButton);
+                    todoList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
         // Add a new todo
@@ -47,25 +55,43 @@
 
             if (text === '') return;
 
-            await fetch(`${backendUrl}/todos`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text }),
-            });
+            try {
+                const response = await fetch(`${backendUrl}/todos`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text }),
+                });
 
-            input.value = '';
-            fetchTodos();
+                if (!response.ok) {
+                    console.error('Error adding todo:', response.statusText);
+                    return;
+                }
+
+                input.value = '';
+                fetchTodos();
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
         // Delete a todo
         async function deleteTodo(id) {
-            await fetch(`${backendUrl}/todos/${id}`, {
-                method: 'DELETE',
-            });
+            try {
+                const response = await fetch(`${backendUrl}/todos/${id}`, {
+                    method: 'DELETE',
+                });
 
-            fetchTodos();
+                if (!response.ok) {
+                    console.error('Error deleting todo:', response.statusText);
+                    return;
+                }
+
+                fetchTodos();
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
         fetchTodos();
