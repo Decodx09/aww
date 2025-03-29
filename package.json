@@ -11,6 +11,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
-    "mongoose": "^8.13.1"
+    "helmet": "^8.1.0",
+    "mongoose": "^8.13.1",
+    "morgan": "^1.10.0"
   }
 }
